@@ -1,5 +1,7 @@
-using Unity.VisualScripting;
+using System.Collections.Generic;
+using System;
 using UnityEngine;
+using R3;
 
 /// <summary>
 /// 行動規定
@@ -21,17 +23,17 @@ public class LiveTemp : MonoBehaviour
     /// <summary>
     /// ヒットポイント
     /// </summary>
-    public float Hp;
+    public ReactiveProperty<float> Hp { get; private set; } = new();
 
     /// <summary>
     /// 攻撃力
     /// </summary>
-    public float Power;
+    public float AttackPower;
 
     /// <summary>
     /// 移動速度
     /// </summary>
-    public float Speed;
+    public float MoveSpeed;
 
     /// <summary>
     /// ジャンプ力
@@ -57,6 +59,11 @@ public class LiveTemp : MonoBehaviour
     /// アニメータ－コンポーネント
     /// </summary>
     protected Animator Anima;
+
+    /// <summary>
+    /// enum
+    /// </summary>
+    public Dictionary<ModeTypeList, Action> action;
 
     /*-----*/
 

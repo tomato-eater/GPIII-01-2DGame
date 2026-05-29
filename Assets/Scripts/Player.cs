@@ -3,8 +3,6 @@ using R3;               // R3 core
 using R3.Triggers;
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -14,11 +12,6 @@ using UnityEngine.InputSystem;
 public class Player : LiveTemp
 {
     /// <summary>
-    /// enum
-    /// </summary>
-    private Dictionary<ModeTypeList, Action> action;
-
-    /// <summary>
     /// 移動量の取得
     /// </summary>
     float MoveValue;
@@ -27,6 +20,19 @@ public class Player : LiveTemp
     /// 空中ジャンプの判定
     /// </summary>
     bool DoubleJump;
+
+    /// <summary>
+    /// ジャンプを実行するかの判定
+    /// </summary>
+    bool JumpTrriger;
+
+    /// <summary>
+    /// HpやAttackPower等を取得
+    /// </summary>
+    private void Awake()
+    {
+        Hp.Value = 10;
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -40,7 +46,20 @@ public class Player : LiveTemp
     }
 
     /// <summary>
-    /// PlayerInputのMoveが操作されたのを検知
+    /// PlayerInputのAttackが操作されたのを検知・実行
+    /// </summary>
+    /// <param name="value"></param>
+    void OnAttack(InputValue value)
+    {
+        if (ModeType != ModeTypeList.Default) return;
+        ModeType = ModeTypeList.Attack;
+        MoveValue = 0;
+        Anima.Play("Attack");
+        Rb2d.gravityScale = 6;
+    }
+
+    /// <summary>
+    /// PlayerInputのMoveが操作されたのを検知・実行
     /// </summary>
     /// <param name="value"></param>
     void OnMove(InputValue value)
@@ -49,16 +68,16 @@ public class Player : LiveTemp
         MoveValue = Value.x;
     }
 
+    /// <summary>
+    /// PlayerInputのJumpが操作さたのを検知・実行
+    /// </summary>
+    /// <param name="value"></param>
     void OnJump(InputValue value)
     {
-
+        if (DoubleJump || IsGround)
+            JumpTrriger = true;
     }
 
-    void OnAttack(InputValue value)
-    {
-        if (value.isPressed && (ModeType == ModeTypeList.Default))
-            ModeType = ModeTypeList.Attack;
-    }
 
     // Update is called once per frame
     void Update()
@@ -68,32 +87,54 @@ public class Player : LiveTemp
     }
 
 
+
+    /// <summary>
+    /// Playerの移動、ジャンプ等
+    /// </summary>
     public override void Default()
     {
-        Debug.Log("PlayerのDefault");
+        Rb2d.linearVelocityX = MoveValue * MoveSpeed;
+
+        if (MoveValue != 0 && ModeType == ModeTypeList.Default)
+            transform.localScale = new ( Mathf.Sign(MoveValue), 1, 1);
+
+        if (JumpTrriger)
+        {
+            JumpTrriger = false;
+            var power = JumpPower;
+            if (!IsGround)
+            {
+                DoubleJump = false;
+                power *= 0.85f;
+            }
+            Rb2d.linearVelocityY = power;
+        }
+        if (IsGround)
+            Rb2d.gravityScale = 3;
     }
 
+    /// <summary>
+    /// 攻撃
+    /// </summary>
     public override void Attack()
     {
-        CancellationToken ct=this.GetCancellationTokenOnDestroy();
-        Anima.Play("Attack");
-        Attacking(ct).Forget();
+        JumpTrriger = false;
+        if (Anima.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
+            ModeType = ModeTypeList.Default;
     }
 
-    async UniTask Attacking(CancellationToken ct)
-    {
-        await UniTask.Yield(PlayerLoopTiming.Update, ct); // 1フレーム待機
-        await UniTask.WaitUntil(() => Anima.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f, cancellationToken: ct);
-        ModeType = ModeTypeList.Default;
-    }
-
-    //メモ　unity 再生したアニメーションが終わるまで待つ UniTask
-
+    /// <summary>
+    /// 死んだら実行
+    /// </summary>
     public override void Death()
     {
-        Debug.Log("PlayerのDeath");
+       
     }
 
+    /// <summary>
+    /// 足元が何かに当たったら
+    /// </summary>
+    /// <param name="collision"></param>
     private void OnCollisionEnter2D(Collision2D collision)
     {
         foreach (ContactPoint2D cont in collision.contacts)
@@ -106,27 +147,36 @@ public class Player : LiveTemp
                     //EnemyJump();
                     break;
                 }
-                else
+                else if(collision.collider.CompareTag("Floor"))
                 {
-                    break;
+                    IsGround = true;
+                    DoubleJump = true;
                 }
             }
         }
     }
 
+    /// <summary>
+    /// 地面から離れた
+    /// </summary>
+    /// <param name="collision"></param>
     private void OnCollisionExit2D(Collision2D collision)
     {
-        foreach(ContactPoint2D cont in collision.contacts)
+        if (collision.collider.CompareTag("Floor"))
         {
-            if (cont.normal.y > 0.5f)
-            {
-                IsGround = false;
-            }
+            IsGround = false;
         }
     }
 
+    /// <summary>
+    /// 攻撃が敵に当たった
+    /// </summary>
+    /// <param name="collision"></param>
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log(collision.name);
+        if (collision.CompareTag("Enemy"))
+        {
+            Debug.Log(collision.name);
+        }
     }
 }
