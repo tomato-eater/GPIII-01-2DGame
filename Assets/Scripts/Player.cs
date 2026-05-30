@@ -24,7 +24,7 @@ public class Player : LiveTemp
     /// <summary>
     /// ジャンプを実行するかの判定
     /// </summary>
-    bool JumpTrriger;
+    bool JumpTrigger;
 
     /// <summary>
     /// HpやAttackPower等を取得
@@ -41,6 +41,7 @@ public class Player : LiveTemp
             { ModeTypeList.Default, Default },
             { ModeTypeList.Attack,  Attack  },
             { ModeTypeList.Death,   Death   }};
+
         Rb2d = GetComponent<Rigidbody2D>();
         Anima = GetComponentInChildren<Animator>();
     }
@@ -52,10 +53,10 @@ public class Player : LiveTemp
     void OnAttack(InputValue value)
     {
         if (ModeType != ModeTypeList.Default) return;
+
         ModeType = ModeTypeList.Attack;
-        MoveValue = 0;
         Anima.Play("Attack");
-        Rb2d.gravityScale = 6;
+        Rb2d.gravityScale = 8;
     }
 
     /// <summary>
@@ -75,9 +76,8 @@ public class Player : LiveTemp
     void OnJump(InputValue value)
     {
         if (DoubleJump || IsGround)
-            JumpTrriger = true;
+            JumpTrigger = true;
     }
-
 
     // Update is called once per frame
     void Update()
@@ -86,31 +86,36 @@ public class Player : LiveTemp
         if (action.ContainsKey(ModeType)) action[ModeType].Invoke();
     }
 
-
-
     /// <summary>
     /// Playerの移動、ジャンプ等
     /// </summary>
     public override void Default()
     {
-        Rb2d.linearVelocityX = MoveValue * MoveSpeed;
+        Rb2d.linearVelocityX = MoveValue * (IsGround ? MoveSpeed : MoveSpeed * 0.5f);
 
-        if (MoveValue != 0 && ModeType == ModeTypeList.Default)
-            transform.localScale = new ( Mathf.Sign(MoveValue), 1, 1);
-
-        if (JumpTrriger)
-        {
-            JumpTrriger = false;
-            var power = JumpPower;
-            if (!IsGround)
-            {
-                DoubleJump = false;
-                power *= 0.85f;
-            }
-            Rb2d.linearVelocityY = power;
-        }
         if (IsGround)
+        {
             Rb2d.gravityScale = 3;
+
+            if (MoveValue != 0)
+            {
+                transform.localScale = new(Mathf.Sign(MoveValue), 1, 1);
+            } 
+            Anima.Play(MoveValue == 0 ? "Idle" : "Run");
+        }
+
+        if (JumpTrigger) 
+        {
+            JumpTrigger = false;
+            DoubleJump = IsGround;
+            Rb2d.linearVelocityY = IsGround ? JumpPower : JumpPower * 0.8f;
+
+            if (MoveValue != 0)
+                transform.localScale = new(Mathf.Sign(MoveValue), 1, 1);
+
+            if (!DoubleJump)
+                Anima.Play("Jump");
+        }
     }
 
     /// <summary>
@@ -118,8 +123,8 @@ public class Player : LiveTemp
     /// </summary>
     public override void Attack()
     {
-        JumpTrriger = false;
-        if (Anima.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
+        JumpTrigger = false;
+        if (Anima.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.98f)
             ModeType = ModeTypeList.Default;
     }
 
@@ -174,9 +179,11 @@ public class Player : LiveTemp
     /// <param name="collision"></param>
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Enemy"))
+        if(collision.TryGetComponent<LiveTemp>(out var live))
         {
-            Debug.Log(collision.name);
+            Debug.Log("Playerの攻撃が敵に当たった");
+            Debug.Log(live.gameObject.name);
         }
+        Hp.Value -= 0.5f;
     }
 }

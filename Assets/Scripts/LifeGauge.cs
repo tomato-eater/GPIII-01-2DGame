@@ -10,19 +10,21 @@ public class LifeGauge : MonoBehaviour
     [SerializeField] Player player;
     [SerializeField] Image gaugeImage;
     [SerializeField] TextMeshProUGUI lifeText;
-    [SerializeField] TextMeshProUGUI maxLifeText;
+    float MaxHp;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        maxLifeText.text = player.Hp.Value.ToString();
-        player.Hp.Subscribe(Hp => lifeText.text = Hp.ToString()).AddTo(this);
-        player.Hp.Select(Hp => Hp / float.Parse(maxLifeText.text)).Subscribe(Hp => gaugeImage.fillAmount = Hp).AddTo(this);
+        MaxHp = player.Hp.Value;
+        player.Hp.Subscribe(Hp => UpGauge(Hp)).AddTo(this);
     }
 
-    // Update is called once per frame
-    void Update()
+    void UpGauge(float hp)
     {
-        
+        if (hp < 0) hp = 0;
+        lifeText.text = hp.ToString("0");
+        float ratio = hp / MaxHp;
+
+        gaugeImage.fillAmount = ratio;
     }
 }

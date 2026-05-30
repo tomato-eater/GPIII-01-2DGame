@@ -11,6 +11,7 @@ public enum ModeTypeList
     First,
     Default,
     Attack,
+    Damage,
     Death,
     Finish
 }
@@ -41,11 +42,6 @@ public class LiveTemp : MonoBehaviour
     public float JumpPower;
 
     /// <summary>
-    /// 行動規定
-    /// </summary>
-    public ModeTypeList ModeType;
-
-    /// <summary>
     /// 接地判定
     /// </summary>
     protected bool IsGround;
@@ -59,6 +55,11 @@ public class LiveTemp : MonoBehaviour
     /// アニメータ－コンポーネント
     /// </summary>
     protected Animator Anima;
+
+    /// <summary>
+    /// 行動規定
+    /// </summary>
+    public ModeTypeList ModeType;
 
     /// <summary>
     /// enum
@@ -81,6 +82,11 @@ public class LiveTemp : MonoBehaviour
     /// 攻撃時に呼び出される関数
     /// </summary>
     public virtual void Attack() { Debug.Log("テンプレートAttack"); }
+
+    /// <summary>
+    /// ダメージ時に呼び出される関数
+    /// </summary>
+    public virtual void Damage() { Debug.Log("テンプレートDamage"); }
 
     /// <summary>
     /// 死亡時に呼び出される関数
