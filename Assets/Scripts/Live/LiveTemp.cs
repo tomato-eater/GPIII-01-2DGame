@@ -86,7 +86,7 @@ public class LiveTemp : MonoBehaviour
     /// <summary>
     /// ダメージ時に呼び出される関数
     /// </summary>
-    public virtual void Damage() { Debug.Log("テンプレートDamage"); }
+    public virtual void Damage(float damageAmount, float posX) { Debug.Log("テンプレートDamage"); }
 
     /// <summary>
     /// 死亡時に呼び出される関数

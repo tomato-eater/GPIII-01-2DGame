@@ -27,10 +27,16 @@ public class Player : LiveTemp
     bool JumpTrigger;
 
     /// <summary>
+    /// ダメージを受けるかの判定
+    /// </summary>
+    public bool DisableDamage;
+
+    /// <summary>
     /// HpやAttackPower等を取得
     /// </summary>
     private void Awake()
     {
+        ModeType = ModeTypeList.First;
         Hp.Value = 10;
     }
 
@@ -124,8 +130,40 @@ public class Player : LiveTemp
     public override void Attack()
     {
         JumpTrigger = false;
+        DisableDamage = true;
         if (Anima.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.98f)
+        {
             ModeType = ModeTypeList.Default;
+            DisableDamage = false;
+        }
+    }
+
+    /// <summary>
+    /// 攻撃されたとき実行
+    /// </summary>
+    /// <param name="damage"></param>
+    /// <param name="posX"></param>
+    public override void Damage(float damage, float posX)
+    {
+        if (DisableDamage) return;
+        DisableDamage = true;
+        ModeType = ModeTypeList.Damage;
+        var dir = Mathf.Sign(transform.position.x - posX);
+        Rb2d.AddForce(new Vector2(dir * 5, 5), ForceMode2D.Impulse);
+        DamageProcess(damage).Forget();
+    }
+
+    /// <summary>
+    /// ダメージ処理
+    /// </summary>
+    /// <param name="damage"></param>
+    /// <returns></returns>
+    async UniTask DamageProcess(float damage)
+    {
+        Hp.Value -= damage;
+        await UniTask.Delay(TimeSpan.FromSeconds(0.3f));
+        ModeType = ModeTypeList.Default;
+        DisableDamage = false;
     }
 
     /// <summary>
@@ -183,7 +221,7 @@ public class Player : LiveTemp
         {
             Debug.Log("Playerの攻撃が敵に当たった");
             Debug.Log(live.gameObject.name);
+            live.Damage(IsGround ? AttackPower : AttackPower * 1.5f, transform.position.x);
         }
-        Hp.Value -= 0.5f;
     }
 }
