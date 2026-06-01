@@ -1,7 +1,13 @@
 using UnityEngine;
 
+/// <summary>
+/// 1種類目のスライムの制御クラス
+/// </summary>
 public class Slime_01 : LiveTemp
 {
+    /// <summary>
+    /// ステータスを取得
+    /// </summary>
     void Awake()
     {
         Hp.Value = 5;

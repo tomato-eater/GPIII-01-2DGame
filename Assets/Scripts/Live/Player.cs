@@ -32,7 +32,7 @@ public class Player : LiveTemp
     public bool DisableDamage;
 
     /// <summary>
-    /// HpやAttackPower等を取得
+    /// ステータスを取得
     /// </summary>
     private void Awake()
     {
@@ -45,8 +45,7 @@ public class Player : LiveTemp
     {
         action = new Dictionary<ModeTypeList, Action>() {
             { ModeTypeList.Default, Default },
-            { ModeTypeList.Attack,  Attack  },
-            { ModeTypeList.Death,   Death   }};
+            { ModeTypeList.Attack,  Attack  },};
 
         Rb2d = GetComponent<Rigidbody2D>();
         Anima = GetComponentInChildren<Animator>();
@@ -161,6 +160,13 @@ public class Player : LiveTemp
     async UniTask DamageProcess(float damage)
     {
         Hp.Value -= damage;
+        if (Hp.Value <= 0)
+        {
+            Hp.Value = 0;
+            ModeType= ModeTypeList.Death;
+            Death();
+            return;
+        }
         await UniTask.Delay(TimeSpan.FromSeconds(0.3f));
         ModeType = ModeTypeList.Default;
         DisableDamage = false;
@@ -171,7 +177,12 @@ public class Player : LiveTemp
     /// </summary>
     public override void Death()
     {
-       
+        Anima.Play("Die");
+        Rb2d.simulated = false;
+        if(TryGetComponent<BoxCollider2D>(out var coll))
+        {
+            coll.enabled = false;
+        }
     }
 
     /// <summary>
