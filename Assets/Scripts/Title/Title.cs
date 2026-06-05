@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -47,7 +48,16 @@ public class Title : MonoBehaviour
     /// </summary>
     int selectNo = -1;
 
-    [SerializeField] StatusDataList statusDataList;
+    /// <summary>
+    /// データリスト
+    /// </summary>
+    [SerializeField] StatusList StatusList;
+
+    /// <summary>
+    /// タイトルSceneの次のScene
+    /// </summary>
+    [SerializeField] SceneAsset NextScene;
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -88,7 +98,6 @@ public class Title : MonoBehaviour
                 File.Create(Path.Combine(folder, "Data_" + i + ".txt")).Close();
             }
             string text = File.ReadAllLines(Path.Combine(folder, "Data_" + i + ".txt")).ElementAtOrDefault(0) ?? "";
-            Debug.Log(text);
             if (text == "")
             {
                 list.GetChild(i).Find("List/NameText").GetComponent<TextMeshProUGUI>().text = "";
@@ -118,6 +127,7 @@ public class Title : MonoBehaviour
             case -1:
             case 0:
             case 1:
+            case 5:
                 Anima.Play("TitleFront2");
                 return;
 
@@ -183,7 +193,7 @@ public class Title : MonoBehaviour
                 Anima.Play("TitleFront1");
                 break;
             default:
-                Debug.Log("Game Start");
+                GameManager.MyGameInstance.LoadScene(NextScene.name);
                 break;
         }
     }
@@ -277,7 +287,7 @@ public class Title : MonoBehaviour
 
                 if (!Directory.Exists(folder))
                     Directory.CreateDirectory(folder);
-                var data = statusDataList.statusDataList[0].GetStatus();
+                var data = StatusList.statusDataList[0].GetStatus();
                 using (StreamWriter sw = new StreamWriter(Path.Combine(folder, fail), false))
                 {
                     sw.WriteLine("Name:" + SecondImage.transform.Find("SelectedData/InputField").GetComponent<TMP_InputField>().text);
@@ -287,6 +297,7 @@ public class Title : MonoBehaviour
                     sw.WriteLine("DEF:" + data.def);
                     sw.WriteLine("SPD:" + data.spd);
                     sw.WriteLine("JPW:" + data.jpw);
+                    sw.WriteLine("PIT:" + data.pit);
                 }
                 break;
             //ロードタブ
@@ -304,6 +315,7 @@ public class Title : MonoBehaviour
                     if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
                     File.Delete(Path.Combine(folder, fail));
                     GetData();
+                    ButtonTrigger(Mode);
                 }
                 SecondImage.transform.Find("SelectedData").gameObject.SetActive(false);
                 return;
@@ -313,6 +325,8 @@ public class Title : MonoBehaviour
                 return;
         }
 
-        GameManager.MyGameInstance.StartGame(selectNo, 1);
+        GameManager.MyGameInstance.LoadPanel(true);
+        Anima.Play("TitleFront2");
+
     }
 }

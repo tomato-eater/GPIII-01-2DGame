@@ -18,23 +18,10 @@ public class StatusData : ScriptableObject
     [SerializeField, Tooltip("DEF")] int Def;
     [SerializeField, Tooltip("SPD")] int Spd;
     [SerializeField, Tooltip("JPW")] int Jpw;
+    [SerializeField, Tooltip("PIT")] int Pit;
 
-    public (string name, int lvl, int hp, int atk, int def, int spd, int jpw) GetStatus()
+    public (string name, int lvl, int hp, int atk, int def, int spd, int jpw, int pit) GetStatus()
     {
-        return (Name, Lvl, Hp, Atk, Def, Spd, Jpw);
-    }
-}
-
-/// <summary>
-/// ステータスデータのリストを格納するクラス
-/// </summary>
-[CreateAssetMenu(fileName = "StatusDataList", menuName = "ScriptableObjects/StatusDataList")]
-public class StatusDataList : ScriptableObject
-{
-    public List<StatusData> statusDataList = new List<StatusData>();
-
-    public StatusData GetStatusDataById(int id)
-    {
-        return statusDataList.Find(status => status.id == id);
+        return (Name, Lvl, Hp, Atk, Def, Spd, Jpw, Pit);
     }
 }

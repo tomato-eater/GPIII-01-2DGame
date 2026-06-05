@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -27,21 +28,39 @@ public class GameManager : MonoBehaviour
         MyGameInstance = this;
         DontDestroyOnLoad(gameObject);
     }
-
+    /// <summary>
+    /// ゲーム終了時、実行
+    /// </summary>
     private void OnApplicationQuit()
     {
         MyGameInstance = null;
     }
 
     /// <summary>
-    /// ゲームのStartボタンが押されたら呼び出される関数
+    /// セーブ番号登録
     /// </summary>
     /// <param name="dataNo"></param>
-    /// <param name="nextS"></param>
-    public void StartGame(int dataNo, int nextS)
+    public void SetDataNo(int dataNo) { DataNo = dataNo; }
+
+    /// <summary>
+    /// セーブ番号取得
+    /// </summary>
+    /// <returns></returns>
+    public int GetDataNo() { return DataNo; }
+
+    /// <summary>
+    /// ロード画面を表示させる
+    /// </summary>
+    public void LoadPanel(bool activ)
     {
-        DataNo = dataNo;
-        transform.GetChild(0).gameObject.SetActive(true);
-        
+        transform.GetChild(0).gameObject.SetActive(activ);
     }
+
+    /// <summary>
+    /// Scene切り替え
+    /// </summary>
+    /// <param name="name"></param>
+    public void LoadScene(string name) { SceneManager.LoadScene(name); }
+
+
 }

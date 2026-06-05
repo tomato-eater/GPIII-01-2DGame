@@ -8,12 +8,6 @@ public class LoadUI : MonoBehaviour
     [SerializeField] float hopHeight = 15.0f;  // 跳ねる高さ
     [SerializeField] float hopDuration = 0.3f; // 1文字が跳ねている時間の長さ（0〜1）
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
     // Update is called once per frame
     void Update()
     {

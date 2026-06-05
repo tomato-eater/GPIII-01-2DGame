@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: StatusDataList
-  m_EditorClassIdentifier: Assembly-CSharp::StatusDataList
+  m_Script: {fileID: 11500000, guid: cd19256032702b741a9b66fbae015e21, type: 3}
+  m_Name: StatusList
+  m_EditorClassIdentifier: Assembly-CSharp::StatusList
   statusDataList:
   - {fileID: 11400000, guid: f946721239107c743a749d4c081b4a66, type: 2}
