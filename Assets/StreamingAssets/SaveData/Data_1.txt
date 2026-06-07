@@ -1,8 +1,0 @@
-Name:lll
-Lvl:1
-HP :10
-ATK:10
-DEF:10
-SPD:10
-JPW:10
-PIT:5

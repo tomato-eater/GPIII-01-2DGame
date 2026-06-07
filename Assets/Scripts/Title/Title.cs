@@ -1,63 +1,35 @@
-using NUnit.Framework;
-using R3;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>
-/// タイトルを制御するクラス
-/// </summary>
+/// <summary> タイトルを制御するクラス </summary>
 public class Title : MonoBehaviour
 {
-    /// <summary>
-    /// 画面2のObject
-    /// </summary>
+    /// <summary> 画面2のObject </summary>
     [SerializeField] GameObject SecondImage;
 
-    /// <summary>
-    /// 画面1のボタン達
-    /// </summary>
+    /// <summary> 画面1のボタン達 </summary>
     List<Button> F_Button = new List<Button>();
 
-    /// <summary>
-    /// 画面2のボタン達
-    /// </summary>
+    /// <summary> 画面2のボタン達 </summary>
     List<Button> S_Button = new List<Button>();
 
-    /// <summary>
-    /// アニメーター
-    /// </summary>
+    /// <summary> アニメーター </summary>
     [SerializeField] Animator Anima;
 
-    /// <summary>
-    /// ボタンの番号を格納する変数
-    /// </summary>
+    /// <summary> ボタンの番号を格納する変数 </summary>
     int Mode = 0;
 
-    /// <summary>
-    /// 右側のやつ
-    /// </summary>
+    /// <summary> 右側のやつ </summary>
     Transform S_Box;
 
-    /// <summary>
-    /// データ番号を格納する変数
-    /// </summary>
+    /// <summary> データ番号を格納する変数 </summary>
     int selectNo = -1;
 
-    /// <summary>
-    /// データリスト
-    /// </summary>
-    [SerializeField] StatusList StatusList;
-
-    /// <summary>
-    /// タイトルSceneの次のScene
-    /// </summary>
+    /// <summary> タイトルSceneの次のScene </summary>
     [SerializeField] SceneAsset NextScene;
-
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -80,24 +52,19 @@ public class Title : MonoBehaviour
         S_Box = SecondImage.transform.Find("Box");
 
         GetData();
+        GameManager.MyGameInstance.LoadPanel(false);
     }
 
-    /// <summary>
-    /// セーブデータの情報を取得する関数
-    /// </summary>
+    /// <summary> セーブデータの情報を取得する関数 </summary>
     void GetData()
     {
         var list = S_Box.Find("DataList/Viewport/Content");
-        var folder = Path.Combine(Application.streamingAssetsPath, "SaveData");
-        if (!Directory.Exists(folder))
-            Directory.CreateDirectory(folder);
-        for (int i = 0; i < 6; i++)
+
+        GameManager.MyGameInstance.CheckDataFolder();
+
+        for (int i = 0; i < GameManager.MyGameInstance.SAVEFAILCOUNT; i++)
         {
-            if (!File.Exists(Path.Combine(folder, "Data_" + i + ".txt")))
-            {
-                File.Create(Path.Combine(folder, "Data_" + i + ".txt")).Close();
-            }
-            string text = File.ReadAllLines(Path.Combine(folder, "Data_" + i + ".txt")).ElementAtOrDefault(0) ?? "";
+            var text = GameManager.MyGameInstance.CheckDataFile(i);
             if (text == "")
             {
                 list.GetChild(i).Find("List/NameText").GetComponent<TextMeshProUGUI>().text = "";
@@ -108,9 +75,7 @@ public class Title : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// いずれかのボタンを押下
-    /// </summary>
+    /// <summary> いずれかのボタンを押下 </summary>
     /// <param name="no"></param>
     public void ButtonTrigger(int no)
     {
@@ -166,25 +131,18 @@ public class Title : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// フェードイン・アウトの完了を検知
-    /// </summary>
-    public void Fade()
-    {
-        switch(Mode)
-        {
+    /// <summary> フェードイン・アウトの完了を検知 </summary>
+    public void Fade() {
+        switch(Mode) {
             case -1:
-#if UNITY_EDITOR
-                UnityEditor.EditorApplication.isPlaying = false;
-#else
-                Application.Quit()
-#endif
+                GameManager.MyGameInstance.Quit();
                 break;
 
             case 0:
                 SecondImage.SetActive(false);
                 Anima.Play("TitleFront1");
                 break;
+
             case 1:
                 SecondImage.SetActive(true);
                 for (int i = 0; i < S_Box.childCount; i++)
@@ -192,15 +150,14 @@ public class Title : MonoBehaviour
                 S_Box.Find("DataList/Viewport/Content").GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
                 Anima.Play("TitleFront1");
                 break;
+
             default:
                 GameManager.MyGameInstance.LoadScene(NextScene.name);
                 break;
         }
     }
 
-    /// <summary>
-    /// データのボタンを押下
-    /// </summary>
+    /// <summary> データのボタンを押下 </summary>
     /// <param name="no"></param>
     public void DataButton(int no)
     {
@@ -273,60 +230,43 @@ public class Title : MonoBehaviour
         for (int i = 0; i < image.childCount; i++)
             image.GetChild(i).GetComponent<Button>().interactable = false;
 
-        var folder = Path.Combine(Application.streamingAssetsPath, "SaveData");
-        string fail = "Data_" + selectNo + ".txt";
-        switch (Mode)
-        {
+        switch (Mode) {
             //ニューゲームタブ
             case 2:
-                if (!start)
-                { 
+                if (!start) { 
                     SecondImage.transform.Find("SelectedData").gameObject.SetActive(false);
                     return;
                 }
-
-                if (!Directory.Exists(folder))
-                    Directory.CreateDirectory(folder);
-                var data = StatusList.statusDataList[0].GetStatus();
-                using (StreamWriter sw = new StreamWriter(Path.Combine(folder, fail), false))
-                {
-                    sw.WriteLine("Name:" + SecondImage.transform.Find("SelectedData/InputField").GetComponent<TMP_InputField>().text);
-                    sw.WriteLine("Lvl:" + data.lvl);
-                    sw.WriteLine("HP :" + data.hp);
-                    sw.WriteLine("ATK:" + data.atk);
-                    sw.WriteLine("DEF:" + data.def);
-                    sw.WriteLine("SPD:" + data.spd);
-                    sw.WriteLine("JPW:" + data.jpw);
-                    sw.WriteLine("PIT:" + data.pit);
-                }
+                var name = SecondImage.transform.Find("SelectedData/InputField").GetComponent<TMP_InputField>().text;
+                GameManager.MyGameInstance.StartGame(true, selectNo, name);
                 break;
+
             //ロードタブ
             case 3:
-                if (!start)
-                {
+                if (!start) {
                     SecondImage.transform.Find("SelectedData").gameObject.SetActive(false);
                     return;
                 }
+                GameManager.MyGameInstance.StartGame(false, selectNo);
                 break;
+
             //データ削除タブ
             case 4:
-                if (!start)
-                {
-                    if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
-                    File.Delete(Path.Combine(folder, fail));
+                if (!start) {
+                    
+                    GameManager.MyGameInstance.DeleteData(selectNo);
                     GetData();
                     ButtonTrigger(Mode);
                 }
                 SecondImage.transform.Find("SelectedData").gameObject.SetActive(false);
                 return;
+
             //エラー
             default:
                 Debug.LogError("Miss!! Error!! ");
                 return;
         }
-
         GameManager.MyGameInstance.LoadPanel(true);
         Anima.Play("TitleFront2");
-
     }
 }

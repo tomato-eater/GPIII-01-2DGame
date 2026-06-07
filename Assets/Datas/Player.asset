@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: Player
   m_EditorClassIdentifier: Assembly-CSharp::StatusData
   Id: 0
-  Name: Player
-  Lvl: 1
-  Hp: 10
-  Atk: 10
-  Def: 10
-  Spd: 10
-  Jpw: 10
-  Pit: 5
+  statusBox:
+    Nama: 
+    Lvl: 1
+    Hp: 10
+    Atk: 10
+    Def: 10
+    Spd: 10
+    Jpw: 10
+    Pit: 5

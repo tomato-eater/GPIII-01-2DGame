@@ -6,49 +6,35 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-/// <summary>
-/// Playerの操作クラス
-/// </summary>
+/// <summary> Playerの操作クラス </summary>
 public class Player : LiveTemp
 {
-    /// <summary>
-    /// 移動量の取得
-    /// </summary>
+    /// <summary> 移動量の取得 </summary>
     float MoveValue;
 
-    /// <summary>
-    /// 空中ジャンプの判定
-    /// </summary>
+    /// <summary> 空中ジャンプの判定 </summary>
     bool DoubleJump;
 
-    /// <summary>
-    /// ジャンプを実行するかの判定
-    /// </summary>
+    /// <summary> ジャンプを実行するかの判定 </summary>
     bool JumpTrigger;
 
-    /// <summary>
-    /// ダメージを受けるかの判定
-    /// </summary>
+    /// <summary> ダメージを受けるかの判定 </summary>
     public bool DisableDamage;
 
-    /// <summary>
-    /// ステータスを取得
-    /// </summary>
+    ///<summary> 空中滞在時間 </summary>
+    float AirTime;
+
+    /// <summary> コンポーネント取得等 </summary>
     private void Awake()
     {
         ModeType = ModeTypeList.First;
-        Hp.Value = 10;
-    }
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
         action = new Dictionary<ModeTypeList, Action>() {
             { ModeTypeList.Default, Default },
             { ModeTypeList.Attack,  Attack  },};
 
         Rb2d = GetComponent<Rigidbody2D>();
         Anima = GetComponentInChildren<Animator>();
+
     }
 
     /// <summary>
@@ -64,15 +50,9 @@ public class Player : LiveTemp
         Rb2d.gravityScale = 8;
     }
 
-    /// <summary>
-    /// PlayerInputのMoveが操作されたのを検知・実行
-    /// </summary>
+    /// <summary> PlayerInputのMoveが操作されたのを検知・実行 </summary>
     /// <param name="value"></param>
-    void OnMove(InputValue value)
-    {
-        var Value = value.Get<Vector2>();
-        MoveValue = Value.x;
-    }
+    void OnMove(InputValue value) { MoveValue = value.Get<Vector2>().x; }
 
     /// <summary>
     /// PlayerInputのJumpが操作さたのを検知・実行
@@ -84,11 +64,34 @@ public class Player : LiveTemp
             JumpTrigger = true;
     }
 
+    /// <summary> GiveUpButton </summary>
+    /// <param name="value"></param>
+    void OnGiveUp(InputValue value)
+    {
+        if (ModeType == ModeTypeList.Default)
+        {
+            ModeType = ModeTypeList.Give;
+        }
+        else if (ModeType == ModeTypeList.Give)
+        {
+            ModeType = ModeTypeList.Default;
+        }
+
+    }
+
     // Update is called once per frame
     void Update()
     {
         //ModeTypeによって呼び出す関数を変えている
         if (action.ContainsKey(ModeType)) action[ModeType].Invoke();
+        if (!IsGround)
+        {
+            AirTime += Time.deltaTime;
+        }
+        else if(AirTime > 0)
+        {
+
+        }
     }
 
     /// <summary>
@@ -232,7 +235,7 @@ public class Player : LiveTemp
         {
             Debug.Log("Playerの攻撃が敵に当たった");
             Debug.Log(live.gameObject.name);
-            live.Damage(IsGround ? AttackPower : AttackPower * 1.5f, transform.position.x);
+            live.Damage((IsGround ? AttackPower : AttackPower * 1.5f) + AirTime, transform.position.x);
         }
     }
 }

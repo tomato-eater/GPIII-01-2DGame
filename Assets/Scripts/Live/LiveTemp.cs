@@ -13,6 +13,7 @@ public enum ModeTypeList
     Attack,
     Damage,
     Death,
+    Give,
     Finish
 }
 
