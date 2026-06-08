@@ -2376,7 +2376,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuBattle
   S_Asset:
-  - {fileID: 0}
+  - {fileID: 102900000, guid: 0f6f97b97657f224887a98ead771bfa4, type: 3}
 --- !u!1 &509746823
 GameObject:
   m_ObjectHideFlags: 0

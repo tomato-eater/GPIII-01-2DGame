@@ -34,7 +34,16 @@ public class Player : LiveTemp
 
         Rb2d = GetComponent<Rigidbody2D>();
         Anima = GetComponentInChildren<Animator>();
+    }
 
+    /// <summary> Status登録 </summary>
+    /// <param name="box"></param>
+    public override void SetStatus(StatusBox box) {
+        Hp.Value = box.Hp;
+        AttackPower = box.Atk;
+        Defense = box.Def;
+        MoveSpeed = box.Spd;
+        JumpPower = box.Jpw;
     }
 
     /// <summary>
@@ -78,6 +87,7 @@ public class Player : LiveTemp
         {
             ModeType = ModeTypeList.Default;
         }
+        Debug.Log(ModeType);
 
     }
 
@@ -145,6 +155,8 @@ public class Player : LiveTemp
     public override void Damage(float damage, float posX)
     {
         if (DisableDamage) return;
+        damage -= Defense;
+        if (damage <= 0) damage = 0.01f;
         DisableDamage = true;
         ModeType = ModeTypeList.Damage;
         var dir = Mathf.Sign(transform.position.x - posX);
@@ -204,20 +216,18 @@ public class Player : LiveTemp
                 else if(collision.collider.CompareTag("Floor"))
                 {
                     IsGround = true;
-                    DoubleJump = true;
                 }
             }
         }
     }
 
+    /// <summary> 敵を踏んでいる時 </summary>
     void EnemyJump()
     {
         Rb2d.AddForce(new Vector2(transform.localScale.x * 10, 5), ForceMode2D.Impulse);
     }
 
-    /// <summary>
-    /// 地面から離れた
-    /// </summary>
+    /// <summary> 地面から離れた </summary>
     /// <param name="collision"></param>
     private void OnCollisionExit2D(Collision2D collision)
     {
@@ -227,9 +237,7 @@ public class Player : LiveTemp
         }
     }
 
-    /// <summary>
-    /// 攻撃が敵に当たった
-    /// </summary>
+    /// <summary> 攻撃が敵に当たった </summary>
     /// <param name="collision"></param>
     private void OnTriggerEnter2D(Collider2D collision)
     {

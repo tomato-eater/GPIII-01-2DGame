@@ -1,23 +1,27 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using R3;
-using R3.Triggers;
 
-
+/// <summary> Player‚ÌHPBar‚ğ§Œä‚·‚éƒNƒ‰ƒX </summary>
 public class LifeGauge : MonoBehaviour
 {
-    [SerializeField] Player player;
+    LiveTemp Player;
     [SerializeField] Image gaugeImage;
     float MaxHp;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    /// <summary>
+    /// Player‚ÌHp‚É‰‚¶‚Ä•Ï‰»‚·‚é‚æ‚¤‚É‚·‚é
+    /// </summary>
+    public void SetUp()
     {
-        MaxHp = player.Hp.Value;
-        player.Hp.Subscribe(Hp => UpGauge(Hp)).AddTo(this);
+        this.Player = GameObject.Find("Player").GetComponent<LiveTemp>();
+        MaxHp = Player.Hp.Value;
+        Player.Hp.Subscribe(Hp => UpGauge(Hp)).AddTo(this);
     }
-
+    /// <summary>
+    /// Gauge‚Ì•Ï‰»ˆ—
+    /// </summary>
+    /// <param name="hp"></param>
     void UpGauge(float hp)
     {
         if (hp < 0) hp = 0;

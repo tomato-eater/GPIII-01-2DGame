@@ -11,7 +11,7 @@ public class MenuBattle : MonoBehaviour
     /// <summary> Menu‚ÌBattle‚Å•\¦E”ñ•\¦‚·‚é‚à‚Ì‚ğŒˆ‚ß‚é </summary>
     public void SetUp()
     {
-        int lv = GameManager.MyGameInstance.GetStatus().Lvl;
+        int lv = GameManager.MyGameInstance.GetMyStatus().Lvl;
         SelectScene = 0;
         int i = 0;
         var box = transform.GetChild(0).GetChild(0);

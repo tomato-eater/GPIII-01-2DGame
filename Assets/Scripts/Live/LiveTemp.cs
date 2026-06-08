@@ -22,39 +22,30 @@ public enum ModeTypeList
 /// </summary>
 public class LiveTemp : MonoBehaviour
 {
-    /// <summary>
-    /// ヒットポイント
-    /// </summary>
+    ///<summary> ID </summary>
+    public int Id;
+    /// <summary> ヒットポイント </summary>
     public ReactiveProperty<float> Hp { get; private set; } = new();
 
-    /// <summary>
-    /// 攻撃力
-    /// </summary>
+    /// <summary> 攻撃力 </summary>
     public float AttackPower;
 
-    /// <summary>
-    /// 移動速度
-    /// </summary>
-    public float MoveSpeed;
+    ///<summary> 防御力 </summary>
+    protected float Defense;
 
-    /// <summary>
-    /// ジャンプ力
-    /// </summary>
+    /// <summary> 移動速度 </summary>
+    protected float MoveSpeed;
+
+    /// <summary> ジャンプ力 </summary>
     public float JumpPower;
 
-    /// <summary>
-    /// 接地判定
-    /// </summary>
+    /// <summary> 接地判定 </summary>
     public bool IsGround;
 
-    /// <summary>
-    /// 物理演算コンポーネント
-    /// </summary>
+    /// <summary> 物理演算コンポーネント </summary>
     protected Rigidbody2D Rb2d;
 
-    /// <summary>
-    /// アニメータ－コンポーネント
-    /// </summary>
+    /// <summary> アニメータ－コンポーネント </summary>
     public Animator Anima;
 
     /// <summary>
@@ -69,9 +60,14 @@ public class LiveTemp : MonoBehaviour
 
     /*-----*/
 
-    /// <summary>
-    /// ゲーム開始前に呼び出される関数s
-    /// </summary>
+    /// <summary> IDを取得 </summary>
+    /// <returns></returns>
+    public int GetId() {  return Id; }
+
+    ///<summary> StatusをSet </summary>
+    public virtual void SetStatus(StatusBox box) { Debug.Log("テンプレートSetStatus"); }
+
+    /// <summary> ゲーム開始前に呼び出される関数 </summary>
     public virtual void First() { Debug.Log("テンプレートFirst"); }
 
     /// <summary>

@@ -36,7 +36,7 @@ public class MenuStatus : MonoBehaviour
     /// <summary> ステータスを数値を入れる </summary>
     void GetStatus()
     {
-        var status = GameManager.MyGameInstance.GetStatus();
+        var status = GameManager.MyGameInstance.GetMyStatus();
         T_Name.text = status.Nama;
         T_Level.text = status.Lvl.ToString();
 

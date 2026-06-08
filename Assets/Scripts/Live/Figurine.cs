@@ -17,6 +17,10 @@ public class Figurine : LiveTemp
         Rb2d = GetComponent<Rigidbody2D>();
     }
 
+    public override void SetStatus(StatusBox box)
+    {
+        base.SetStatus(box);
+    }
 
     public override void Damage(float damageAmount, float posX)
     {
@@ -25,7 +29,7 @@ public class Figurine : LiveTemp
         TotalText.text = $"Total : {damageAmount:0.##}";
 
         var dir = Mathf.Sign(transform.position.x - posX);
-        Rb2d.AddForce(new Vector2(dir * 5, 5), ForceMode2D.Impulse);
+        Rb2d.AddForce(new Vector2(dir * (damageAmount * 0.1f), 5), ForceMode2D.Impulse);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

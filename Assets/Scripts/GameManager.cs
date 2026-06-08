@@ -25,10 +25,10 @@ public class GameManager : MonoBehaviour
     /// <summary> セーブファイルの番号 </summary>
     private int DataNo = -1;
 
-    [SerializeField] StatusBox Status;
+    StatusBox P_Status;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start() {
+    void Awake() {
         if(MyGameInstance != null && MyGameInstance != this) {
             Destroy(gameObject);
             return;
@@ -75,8 +75,8 @@ public class GameManager : MonoBehaviour
         var text = CheckDataFile(DataNo);
         if (NewGame)
         {
-            Status = list.GetStatusDataById(0).GetStatus().Clone();
-            Status.Nama = name;
+            P_Status = list.GetStatusDataById(0).GetStatus().Clone();
+            P_Status.Nama = name;
         }
         else
         {
@@ -85,28 +85,30 @@ public class GameManager : MonoBehaviour
                 return;
             }
 
-            Status.Nama = text.Substring(5);
+            P_Status = new StatusBox();
+
+            P_Status.Nama = text.Substring(5);
 
             text = CheckDataFile(no, 1).Substring(5);
-            Status.Lvl = int.Parse(text);
+            P_Status.Lvl = int.Parse(text);
 
             text = CheckDataFile(no, 2).Substring(5);
-            Status.Hp = int.Parse(text);
+            P_Status.Hp = int.Parse(text);
 
             text = CheckDataFile(no, 3).Substring(5);
-            Status.Atk = int.Parse(text);
+            P_Status.Atk = int.Parse(text);
 
             text = CheckDataFile(no, 4).Substring(5);
-            Status.Def = int.Parse(text);
+            P_Status.Def = int.Parse(text);
 
             text = CheckDataFile(no, 5).Substring(5);
-            Status.Spd = int.Parse(text);
+            P_Status.Spd = int.Parse(text);
 
             text = CheckDataFile(no, 6).Substring(5);
-            Status.Jpw = int.Parse(text);
+            P_Status.Jpw = int.Parse(text);
 
             text = CheckDataFile(no, 7).Substring(5);
-            Status.Pit = int.Parse(text);
+            P_Status.Pit = int.Parse(text);
         }
     }
 
@@ -121,26 +123,28 @@ public class GameManager : MonoBehaviour
         CheckDataFolder();
         CheckDataFile(DataNo);
         string[] texts = { 
-            "Name:" + Status.Nama, 
-            "Lvl :" + Status.Lvl, 
-            "Hp  :" + Status.Hp, 
-            "Atk :" + Status.Atk, 
-            "Dfe :" + Status.Def, 
-            "Spd :" + Status.Spd, 
-            "Jpw :" + Status.Jpw, 
-            "Pit :" + Status.Pit 
+            "Name:" + P_Status.Nama, 
+            "Lvl :" + P_Status.Lvl, 
+            "Hp  :" + P_Status.Hp, 
+            "Atk :" + P_Status.Atk, 
+            "Dfe :" + P_Status.Def, 
+            "Spd :" + P_Status.Spd, 
+            "Jpw :" + P_Status.Jpw, 
+            "Pit :" + P_Status.Pit 
         };
         File.WriteAllLines(Path.Combine(SAVEFOLDERPATH + "/" + SAVEFAILPATH(DataNo)), texts);
     }
 
-    public StatusBox GetStatus() { return Status ?? new StatusBox(); }
+    public StatusBox GetMyStatus() { return P_Status ?? new StatusBox(); }
+
+    public StatusBox GetEnStatus(int no) { return list.GetStatusDataById(no).GetStatus().Clone(); }   
 
     public void SetStatus(StatusBox status) {
-        Status.Hp = status.Hp;
-        Status.Atk = status.Atk;
-        Status.Def = status.Def;
-        Status.Spd = status.Spd;
-        Status.Jpw = status.Jpw;
-        Status.Pit = status.Pit;
+        P_Status.Hp = status.Hp;
+        P_Status.Atk = status.Atk;
+        P_Status.Def = status.Def;
+        P_Status.Spd = status.Spd;
+        P_Status.Jpw = status.Jpw;
+        P_Status.Pit = status.Pit;
     }
 }
