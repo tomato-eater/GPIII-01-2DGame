@@ -45,7 +45,7 @@ public class LiveTemp : MonoBehaviour
     /// <summary>
     /// 接地判定
     /// </summary>
-    protected bool IsGround;
+    public bool IsGround;
 
     /// <summary>
     /// 物理演算コンポーネント
@@ -55,7 +55,7 @@ public class LiveTemp : MonoBehaviour
     /// <summary>
     /// アニメータ－コンポーネント
     /// </summary>
-    protected Animator Anima;
+    public Animator Anima;
 
     /// <summary>
     /// 行動規定

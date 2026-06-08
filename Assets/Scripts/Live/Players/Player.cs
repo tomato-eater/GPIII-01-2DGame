@@ -22,7 +22,7 @@ public class Player : LiveTemp
     public bool DisableDamage;
 
     ///<summary> 空中滞在時間 </summary>
-    float AirTime;
+    public float AirTime;
 
     /// <summary> コンポーネント取得等 </summary>
     private void Awake()
@@ -30,7 +30,7 @@ public class Player : LiveTemp
         ModeType = ModeTypeList.First;
         action = new Dictionary<ModeTypeList, Action>() {
             { ModeTypeList.Default, Default },
-            { ModeTypeList.Attack,  Attack  },};
+        };
 
         Rb2d = GetComponent<Rigidbody2D>();
         Anima = GetComponentInChildren<Animator>();
@@ -45,6 +45,8 @@ public class Player : LiveTemp
     {
         if (ModeType != ModeTypeList.Default) return;
 
+        JumpTrigger = false;
+        DisableDamage = true;
         ModeType = ModeTypeList.Attack;
         Anima.Play("Attack");
         Rb2d.gravityScale = 8;
@@ -90,7 +92,7 @@ public class Player : LiveTemp
         }
         else if(AirTime > 0)
         {
-
+            AirTime = 0;
         }
     }
 
@@ -131,13 +133,8 @@ public class Player : LiveTemp
     /// </summary>
     public override void Attack()
     {
-        JumpTrigger = false;
-        DisableDamage = true;
-        if (Anima.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.98f)
-        {
-            ModeType = ModeTypeList.Default;
-            DisableDamage = false;
-        }
+        ModeType = ModeTypeList.Default;
+        DisableDamage = false;
     }
 
     /// <summary>
@@ -196,12 +193,12 @@ public class Player : LiveTemp
     {
         foreach (ContactPoint2D cont in collision.contacts)
         {
-            if (cont.normal.y > 0.5f)
+            if (cont.normal.y > 0.75f)
             {
                 DoubleJump = true;
                 if (collision.collider.CompareTag("Enemy"))
                 {
-                    //EnemyJump();
+                    EnemyJump();
                     break;
                 }
                 else if(collision.collider.CompareTag("Floor"))
@@ -211,6 +208,11 @@ public class Player : LiveTemp
                 }
             }
         }
+    }
+
+    void EnemyJump()
+    {
+        Rb2d.AddForce(new Vector2(transform.localScale.x * 10, 5), ForceMode2D.Impulse);
     }
 
     /// <summary>
@@ -233,8 +235,6 @@ public class Player : LiveTemp
     {
         if(collision.TryGetComponent<LiveTemp>(out var live))
         {
-            Debug.Log("Playerの攻撃が敵に当たった");
-            Debug.Log(live.gameObject.name);
             live.Damage((IsGround ? AttackPower : AttackPower * 1.5f) + AirTime, transform.position.x);
         }
     }
