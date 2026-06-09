@@ -1,6 +1,4 @@
 using Cysharp.Threading.Tasks;
-using R3;               // R3 core
-using R3.Triggers;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,14 +16,11 @@ public class Player : LiveTemp
     /// <summary> ジャンプを実行するかの判定 </summary>
     bool JumpTrigger;
 
-    /// <summary> ダメージを受けるかの判定 </summary>
-    public bool DisableDamage;
-
     ///<summary> 空中滞在時間 </summary>
     public float AirTime;
 
     /// <summary> コンポーネント取得等 </summary>
-    private void Awake()
+    private void Start()
     {
         ModeType = ModeTypeList.First;
         action = new Dictionary<ModeTypeList, Action>() {
@@ -73,22 +68,6 @@ public class Player : LiveTemp
     {
         if (DoubleJump || IsGround)
             JumpTrigger = true;
-    }
-
-    /// <summary> GiveUpButton </summary>
-    /// <param name="value"></param>
-    void OnGiveUp(InputValue value)
-    {
-        if (ModeType == ModeTypeList.Default)
-        {
-            ModeType = ModeTypeList.Give;
-        }
-        else if (ModeType == ModeTypeList.Give)
-        {
-            ModeType = ModeTypeList.Default;
-        }
-        Debug.Log(ModeType);
-
     }
 
     // Update is called once per frame
@@ -157,31 +136,15 @@ public class Player : LiveTemp
         if (DisableDamage) return;
         damage -= Defense;
         if (damage <= 0) damage = 0.01f;
-        DisableDamage = true;
-        ModeType = ModeTypeList.Damage;
-        var dir = Mathf.Sign(transform.position.x - posX);
-        Rb2d.AddForce(new Vector2(dir * 5, 5), ForceMode2D.Impulse);
-        DamageProcess(damage).Forget();
-    }
+        base.Damage(damage, posX);
 
-    /// <summary>
-    /// ダメージ処理
-    /// </summary>
-    /// <param name="damage"></param>
-    /// <returns></returns>
-    async UniTask DamageProcess(float damage)
-    {
         Hp.Value -= damage;
         if (Hp.Value <= 0)
         {
             Hp.Value = 0;
-            ModeType= ModeTypeList.Death;
             Death();
             return;
         }
-        await UniTask.Delay(TimeSpan.FromSeconds(0.3f));
-        ModeType = ModeTypeList.Default;
-        DisableDamage = false;
     }
 
     /// <summary>
@@ -189,6 +152,7 @@ public class Player : LiveTemp
     /// </summary>
     public override void Death()
     {
+        ModeType = ModeTypeList.Death;
         Anima.Play("Die");
         Rb2d.simulated = false;
         if(TryGetComponent<BoxCollider2D>(out var coll))
@@ -210,7 +174,7 @@ public class Player : LiveTemp
                 DoubleJump = true;
                 if (collision.collider.CompareTag("Enemy"))
                 {
-                    EnemyJump();
+                    if (ModeType != ModeTypeList.Attack) EnemyJump();
                     break;
                 }
                 else if(collision.collider.CompareTag("Floor"))

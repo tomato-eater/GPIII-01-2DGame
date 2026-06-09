@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using R3;
+using Cysharp.Threading.Tasks;
 
 /// <summary>
 /// 行動規定
@@ -13,7 +14,6 @@ public enum ModeTypeList
     Attack,
     Damage,
     Death,
-    Give,
     Finish
 }
 
@@ -28,7 +28,7 @@ public class LiveTemp : MonoBehaviour
     public ReactiveProperty<float> Hp { get; private set; } = new();
 
     /// <summary> 攻撃力 </summary>
-    public float AttackPower;
+    protected float AttackPower;
 
     ///<summary> 防御力 </summary>
     protected float Defense;
@@ -37,10 +37,13 @@ public class LiveTemp : MonoBehaviour
     protected float MoveSpeed;
 
     /// <summary> ジャンプ力 </summary>
-    public float JumpPower;
+    protected float JumpPower;
 
     /// <summary> 接地判定 </summary>
     public bool IsGround;
+
+    /// <summary> ダメージを受けるかの判定 </summary>
+    protected bool DisableDamage;
 
     /// <summary> 物理演算コンポーネント </summary>
     protected Rigidbody2D Rb2d;
@@ -56,7 +59,7 @@ public class LiveTemp : MonoBehaviour
     /// <summary>
     /// enum
     /// </summary>
-    public Dictionary<ModeTypeList, Action> action;
+    protected Dictionary<ModeTypeList, Action> action;
 
     /*-----*/
 
@@ -83,7 +86,21 @@ public class LiveTemp : MonoBehaviour
     /// <summary>
     /// ダメージ時に呼び出される関数
     /// </summary>
-    public virtual void Damage(float damageAmount, float posX) { Debug.Log("テンプレートDamage"); }
+    public virtual void Damage(float damageAmount, float posX) {
+        DisableDamage = true;
+        ModeType = ModeTypeList.Damage;
+        var dir = Mathf.Sign(transform.position.x - posX);
+        Rb2d.AddForce(new Vector2(dir * damageAmount, damageAmount), ForceMode2D.Impulse);
+        Timer().Forget();
+    }
+
+    async UniTask Timer()
+    {
+        await UniTask.Delay(TimeSpan.FromSeconds(0.3f));
+        if (ModeType == ModeTypeList.Death) return;
+        ModeType = ModeTypeList.Default;
+        DisableDamage = false;
+    }
 
     /// <summary>
     /// 死亡時に呼び出される関数

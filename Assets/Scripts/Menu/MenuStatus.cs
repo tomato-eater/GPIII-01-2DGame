@@ -125,7 +125,7 @@ public class MenuStatus : MonoBehaviour
         s_Box.Atk = int.Parse(V_Text[1][2].text);
         s_Box.Def = int.Parse(V_Text[1][3].text);
         s_Box.Spd = int.Parse(V_Text[1][4].text);
-        s_Box.Jpw = int.Parse(V_Text[1][4].text);
+        s_Box.Jpw = int.Parse(V_Text[1][5].text);
         GameManager.MyGameInstance.SetStatus(s_Box);
         GetStatus();
     }

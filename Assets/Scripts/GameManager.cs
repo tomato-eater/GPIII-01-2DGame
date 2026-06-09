@@ -20,12 +20,14 @@ public class GameManager : MonoBehaviour
     /// <summary> ゲームマネージャー </summary>
     public static GameManager MyGameInstance {  get; private set; }
 
-    [SerializeField] StatusList list;
+    [SerializeField] StatusList List;
 
     /// <summary> セーブファイルの番号 </summary>
     private int DataNo = -1;
 
     StatusBox P_Status;
+
+    List<bool> ClearStage = new List<bool>();
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake() {
@@ -46,7 +48,11 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary> ゲーム終了時、実行 </summary>
-    private void OnApplicationQuit() { MyGameInstance = null; }
+    private void OnApplicationQuit() {
+        P_Status = null;
+        ClearStage.Clear();
+        MyGameInstance = null;
+    }
 
     /// <summary> セーブフォルダーの確認 </summary>
     public void CheckDataFolder() { if (!Directory.Exists(SAVEFOLDERPATH)) Directory.CreateDirectory(SAVEFOLDERPATH); }
@@ -75,7 +81,7 @@ public class GameManager : MonoBehaviour
         var text = CheckDataFile(DataNo);
         if (NewGame)
         {
-            P_Status = list.GetStatusDataById(0).GetStatus().Clone();
+            P_Status = List.GetStatusDataById(0).GetStatus().Clone();
             P_Status.Nama = name;
         }
         else
@@ -109,6 +115,11 @@ public class GameManager : MonoBehaviour
 
             text = CheckDataFile(no, 7).Substring(5);
             P_Status.Pit = int.Parse(text);
+
+            string clear = CheckDataFile(no, 8).Substring(0);
+            for (int i = 0; i < clear.Length; i++) {
+                ClearStage.Add(int.Parse(clear.Substring(i)) == 1);
+            }
         }
     }
 
@@ -122,22 +133,23 @@ public class GameManager : MonoBehaviour
     {
         CheckDataFolder();
         CheckDataFile(DataNo);
-        string[] texts = { 
-            "Name:" + P_Status.Nama, 
-            "Lvl :" + P_Status.Lvl, 
-            "Hp  :" + P_Status.Hp, 
-            "Atk :" + P_Status.Atk, 
-            "Dfe :" + P_Status.Def, 
-            "Spd :" + P_Status.Spd, 
-            "Jpw :" + P_Status.Jpw, 
-            "Pit :" + P_Status.Pit 
+        List<string> texts = new List<string>{
+            "Name:" + P_Status.Nama,
+            "Lvl :" + P_Status.Lvl,
+            "Hp  :" + P_Status.Hp,
+            "Atk :" + P_Status.Atk,
+            "Dfe :" + P_Status.Def,
+            "Spd :" + P_Status.Spd,
+            "Jpw :" + P_Status.Jpw,
+            "Pit :" + P_Status.Pit,
+            string.Join("", ClearStage.Select(b => b ? "1" : "0"))
         };
         File.WriteAllLines(Path.Combine(SAVEFOLDERPATH + "/" + SAVEFAILPATH(DataNo)), texts);
     }
 
-    public StatusBox GetMyStatus() { return P_Status ?? new StatusBox(); }
+    public StatusBox GetMyStatus() { return P_Status ?? List.GetStatusDataById(0).GetStatus().Clone(); }
 
-    public StatusBox GetEnStatus(int no) { return list.GetStatusDataById(no).GetStatus().Clone(); }   
+    public StatusBox GetEnStatus(int no) { return List.GetStatusDataById(no).GetStatus().Clone(); }   
 
     public void SetStatus(StatusBox status) {
         P_Status.Hp = status.Hp;
@@ -146,5 +158,17 @@ public class GameManager : MonoBehaviour
         P_Status.Spd = status.Spd;
         P_Status.Jpw = status.Jpw;
         P_Status.Pit = status.Pit;
+    }
+
+    public bool GetClearStage(int no)
+    {
+        if(no >= ClearStage.Count) ClearStage.Add(false);
+        return ClearStage[no];
+    }
+
+    public void SetClearStage(int no)
+    {
+        if (no >= ClearStage.Count) Debug.LogError("ClearStageの連携Miss");
+        ClearStage[no] = true;
     }
 }

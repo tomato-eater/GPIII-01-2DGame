@@ -17,8 +17,8 @@ MonoBehaviour:
     Nama: 
     Lvl: 1
     Hp: 10
-    Atk: 10
-    Def: 10
-    Spd: 10
-    Jpw: 10
+    Atk: 5
+    Def: 5
+    Spd: 5
+    Jpw: 5
     Pit: 5
