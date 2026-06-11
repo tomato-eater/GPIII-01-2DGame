@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StatusList
   statusDataList:
   - {fileID: 11400000, guid: f946721239107c743a749d4c081b4a66, type: 2}
+  - {fileID: 11400000, guid: 8abbbd1e8fba65948ae5d82f1f253eda, type: 2}

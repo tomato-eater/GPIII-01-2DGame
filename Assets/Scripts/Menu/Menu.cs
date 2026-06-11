@@ -104,8 +104,7 @@ public class Menu : MonoBehaviour
                 break;
 
             case 1:
-                GameManager.MyGameInstance.LoadPanel(true);
-                GameManager.MyGameInstance.LoadScene(M_Battle.GetSceneName());
+                M_Battle.StartBattle();
                 break;
 
             case 2:

@@ -11,6 +11,9 @@ public class StatusList : ScriptableObject
 
     public StatusData GetStatusDataById(int id)
     {
-        return statusDataList.Find(status => status.id == id);
+        if (0 <= id && id < statusDataList.Count)
+            return statusDataList.Find(status => status.id == id);
+        Debug.LogError("StatusData�͈̔͊O");
+        return null;
     }
 }

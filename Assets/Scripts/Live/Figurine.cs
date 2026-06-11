@@ -1,10 +1,10 @@
-using Cysharp.Threading.Tasks;
-using System;
 using TMPro;
 using UnityEngine;
 
+/// <summary> 訓練所の置物を制御するクラス </summary>
 public class Figurine : LiveTemp
 {
+    //画面下部分のテキスト
     TextMeshProUGUI TotalText;
     TextMeshProUGUI RecentText;
 

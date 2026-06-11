@@ -2,7 +2,6 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 /// <summary> ゲームを制御するクラス </summary>
@@ -20,13 +19,19 @@ public class GameManager : MonoBehaviour
     /// <summary> ゲームマネージャー </summary>
     public static GameManager MyGameInstance {  get; private set; }
 
+    /// <summary> StatusDataを保管してるやつ </summary>
     [SerializeField] StatusList List;
 
     /// <summary> セーブファイルの番号 </summary>
     private int DataNo = -1;
 
+    /// <summary> Battleの番号 </summary>
+    int BattleNo = -1;
+
+    /// <summary> PlayerのStatus </summary>
     StatusBox P_Status;
 
+    /// <summary> Stageの攻略状況 </summary>
     List<bool> ClearStage = new List<bool>();
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -70,22 +75,26 @@ public class GameManager : MonoBehaviour
     /// <summary> ロード画面を表示させる </summary>
     public void LoadPanel(bool active) { transform.GetChild(0).gameObject.SetActive(active); }
 
-    /// <summary> Scene切り替え </summary>
+    /// <summary> Scene切り替え と Battle番号登録 </summary>
     /// <param name="name"></param>
-    public void LoadScene(string name = "Title") { SceneManager.LoadScene(name); }
+    public void LoadScene(string name = "Title", int no = -1) {
+        BattleNo = no;
+        SceneManager.LoadScene(name); 
+    }
 
-    public void StartGame(bool NewGame, int no, string name = "")
-    {
+    /// <summary> TitleSceneにて、ゲームを開始した </summary>
+    /// <param name="NewGame"></param>
+    /// <param name="no"></param>
+    /// <param name="name"></param>
+    public void StartGame(bool NewGame, int no, string name = "") {
         DataNo = no;
         CheckDataFolder();
         var text = CheckDataFile(DataNo);
-        if (NewGame)
-        {
+        if (NewGame) {  //NewGame
             P_Status = List.GetStatusDataById(0).GetStatus().Clone();
             P_Status.Nama = name;
         }
-        else
-        {
+        else {          //LoadGame
             if(text == "") {
                 Quit();
                 return;
@@ -123,14 +132,15 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void DeleteData(int no)
-    {
+    /// <summary> SaveDataを削除 </summary>
+    /// <param name="no"></param>
+    public void DeleteData(int no) {
         CheckDataFolder();
         File.Delete(Path.Combine(SAVEFOLDERPATH, SAVEFAILPATH(no)));
     }
 
-    public void SaveData()
-    {
+    /// <summary> Save実行 </summary>
+    public void SaveData() {
         CheckDataFolder();
         CheckDataFile(DataNo);
         List<string> texts = new List<string>{
@@ -147,10 +157,16 @@ public class GameManager : MonoBehaviour
         File.WriteAllLines(Path.Combine(SAVEFOLDERPATH + "/" + SAVEFAILPATH(DataNo)), texts);
     }
 
+    /// <summary> Player_Statusの数値を取得 </summary>
+    /// <returns></returns>
     public StatusBox GetMyStatus() { return P_Status ?? List.GetStatusDataById(0).GetStatus().Clone(); }
-
+    /// <summary> Enemy_Statusの数値を取得 </summary>
+    /// <param name="no"></param>
+    /// <returns></returns>
     public StatusBox GetEnStatus(int no) { return List.GetStatusDataById(no).GetStatus().Clone(); }   
 
+    /// <summary> P_Statusの数値を更新 </summary>
+    /// <param name="status"></param>
     public void SetStatus(StatusBox status) {
         P_Status.Hp = status.Hp;
         P_Status.Atk = status.Atk;
@@ -160,15 +176,22 @@ public class GameManager : MonoBehaviour
         P_Status.Pit = status.Pit;
     }
 
-    public bool GetClearStage(int no)
-    {
-        if(no >= ClearStage.Count) ClearStage.Add(false);
+    /// <summary> StageのClear状況を取得 </summary>
+    /// <param name="no"></param>
+    /// <returns></returns>
+    public bool GetClearStage(int no) {
+        if (no < 0) {
+            Debug.LogError("StageNoが負");
+            return false;
+        }
+        else if (no >= ClearStage.Count) ClearStage.Add(false);
         return ClearStage[no];
     }
 
-    public void SetClearStage(int no)
-    {
-        if (no >= ClearStage.Count) Debug.LogError("ClearStageの連携Miss");
-        ClearStage[no] = true;
+    /// <summary> StageClear状況を更新 </summary>
+    public void SetClearStage() {
+        if (BattleNo < 0) return;
+        if (BattleNo >= ClearStage.Count) Debug.LogError("ClearStageの連携Miss");
+        ClearStage[BattleNo] = true;
     }
 }

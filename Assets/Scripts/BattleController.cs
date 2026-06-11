@@ -6,8 +6,8 @@ using UnityEngine.UI;
 
 public class BattleController : MonoBehaviour
 {
-    [SerializeField] bool Battle;
-    int EnemyCount = 0;
+    [SerializeField] bool Battle = true;
+    public int EnemyCount = 0;
     List<LiveTemp> Live = new List<LiveTemp>();
     bool Give = false;
     Animator Anima;
@@ -22,7 +22,12 @@ public class BattleController : MonoBehaviour
         transform.GetChild(0).GetChild(0).localScale = Vector3.zero;
 
         SetStatus();
-        SetHpGauge();
+
+        if (Battle)
+        {
+            LifeGauge gauge = FindAnyObjectByType<LifeGauge>();
+            gauge.SetUp();
+        }
 
         StartStandby().Forget();
     }
@@ -50,12 +55,6 @@ public class BattleController : MonoBehaviour
         }
     }
 
-    /// <summary> PlayerÇÃHpGaugeÇÃê›íË </summary>
-    void SetHpGauge()
-    {
-        LifeGauge gauge = FindAnyObjectByType<LifeGauge>();
-        gauge.SetUp();
-    }
 
     async UniTask StartStandby()
     {
@@ -80,7 +79,7 @@ public class BattleController : MonoBehaviour
     {
         if (!Give) return;
         Anima.Play("Give02");
-        GiveUp();
+        MenuReturn(true);
     }
 
     void OnBack(InputValue value)
@@ -90,9 +89,22 @@ public class BattleController : MonoBehaviour
         Anima.Play("Give02");
     }
 
-    public void GiveUp()
+    /// <summary>
+    /// EnemyÇì|ÇµÇΩÇÁåƒÇ—èoÇ∑
+    /// </summary>
+    public void KillEnemy()
+    {
+        if (--EnemyCount <= 0) MenuReturn();
+    }
+
+    void MenuReturn(bool Give = false)
     {
         GetComponent<PlayerInput>().enabled = false;
+        if (Battle)
+        {
+            Debug.Log("gagaga");
+        }
+        if (!Battle || EnemyCount == 0) GameManager.MyGameInstance.SetClearStage();
         GameManager.MyGameInstance.LoadPanel(true);
         GameManager.MyGameInstance.LoadScene("Menu");
     }

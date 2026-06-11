@@ -1292,7 +1292,7 @@ PrefabInstance:
     - target: {fileID: 1583682682107854574, guid: 6a26a2f58e91ff6419551260bf4abdb3, type: 3}
       propertyPath: Name
       value: 
-      objectReference: {fileID: 618446082}
+      objectReference: {fileID: 0}
     - target: {fileID: 1583682682107854574, guid: 6a26a2f58e91ff6419551260bf4abdb3, type: 3}
       propertyPath: player
       value: 
@@ -1394,24 +1394,14 @@ PrefabInstance:
       value: PlayerCanvas
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 5833464856826751182, guid: 6a26a2f58e91ff6419551260bf4abdb3, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 4705536661626879527, guid: 6a26a2f58e91ff6419551260bf4abdb3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 796341379}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6a26a2f58e91ff6419551260bf4abdb3, type: 3}
---- !u!114 &618446082 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1106124569379269012, guid: 6a26a2f58e91ff6419551260bf4abdb3, type: 3}
-  m_PrefabInstance: {fileID: 591407688}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1 &634063357
 GameObject:
   m_ObjectHideFlags: 0

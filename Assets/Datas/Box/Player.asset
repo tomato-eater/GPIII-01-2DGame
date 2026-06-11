@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StatusData
   Id: 0
   statusBox:
-    Nama: 
+    Nama: Debug
     Lvl: 1
-    Hp: 10
-    Atk: 5
-    Def: 5
-    Spd: 5
-    Jpw: 5
+    Hp: 5
+    Atk: 3
+    Def: 3
+    Spd: 3
+    Jpw: 3
     Pit: 5

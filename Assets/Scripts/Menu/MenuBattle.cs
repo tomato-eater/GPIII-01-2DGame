@@ -59,4 +59,10 @@ public class MenuBattle : MonoBehaviour
         Debug.LogError("読み込みシーンの配列外を指定");
         return null;
     }
+
+    public void StartBattle()
+    {
+        GameManager.MyGameInstance.LoadPanel(true);
+        GameManager.MyGameInstance.LoadScene(GetSceneName(),SelectScene);
+    }
 }

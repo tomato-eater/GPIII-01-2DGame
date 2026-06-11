@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using R3;
 using Cysharp.Threading.Tasks;
@@ -59,7 +59,7 @@ public class LiveTemp : MonoBehaviour
     /// <summary>
     /// enum
     /// </summary>
-    protected Dictionary<ModeTypeList, Action> action;
+    protected Dictionary<ModeTypeList, Action> Action;
 
     /*-----*/
 
@@ -68,7 +68,13 @@ public class LiveTemp : MonoBehaviour
     public int GetId() {  return Id; }
 
     ///<summary> StatusをSet </summary>
-    public virtual void SetStatus(StatusBox box) { Debug.Log("テンプレートSetStatus"); }
+    public virtual void SetStatus(StatusBox box) {
+        Hp.Value = box.Hp;
+        AttackPower = box.Atk;
+        Defense = box.Def;
+        MoveSpeed = box.Spd;
+        JumpPower = box.Jpw;
+    }
 
     /// <summary> ゲーム開始前に呼び出される関数 </summary>
     public virtual void First() { Debug.Log("テンプレートFirst"); }
@@ -76,7 +82,7 @@ public class LiveTemp : MonoBehaviour
     /// <summary>
     /// 通常時に呼び出される関数
     /// </summary>
-    public virtual void Default() { Debug.Log("テンプレートMove"); }
+    protected virtual void Default() { Debug.Log("テンプレートMove"); }
 
     /// <summary>
     /// 攻撃時に呼び出される関数
@@ -84,13 +90,17 @@ public class LiveTemp : MonoBehaviour
     public virtual void Attack() { Debug.Log("テンプレートAttack"); }
 
     /// <summary>
-    /// ダメージ時に呼び出される関数
+    /// ダメージ時に呼び出される関数 
+    /// base(無敵化,Mode変更,ノックバック,ダメージ処理)+(Mode条件変更,無敵解除)
     /// </summary>
     public virtual void Damage(float damageAmount, float posX) {
         DisableDamage = true;
         ModeType = ModeTypeList.Damage;
         var dir = Mathf.Sign(transform.position.x - posX);
         Rb2d.AddForce(new Vector2(dir * damageAmount, damageAmount), ForceMode2D.Impulse);
+        // ダメージ調節
+        if ((damageAmount -= Defense) <= 0) damageAmount = 0.01f;
+        Hp.Value -= damageAmount;
         Timer().Forget();
     }
 
@@ -105,7 +115,7 @@ public class LiveTemp : MonoBehaviour
     /// <summary>
     /// 死亡時に呼び出される関数
     /// </summary>
-    public virtual void Death() { Debug.Log("テンプレートDeath"); }
+    protected virtual void Death() { Debug.Log("テンプレートDeath"); }
 
     /// <summary>
     /// ゲーム終了時に呼び出される関数
