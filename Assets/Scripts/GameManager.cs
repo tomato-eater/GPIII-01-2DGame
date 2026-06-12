@@ -43,6 +43,7 @@ public class GameManager : MonoBehaviour
         MyGameInstance = this;
         DontDestroyOnLoad(gameObject);
     }
+
     /// <summary> GameQuit </summary>
     public void Quit() {
 #if UNITY_EDITOR
@@ -72,10 +73,10 @@ public class GameManager : MonoBehaviour
         return File.ReadAllLines(Path.Combine(SAVEFOLDERPATH, SAVEFAILPATH(no))).ElementAtOrDefault(line) ?? "";
     }
 
-    /// <summary> ロード画面を表示させる </summary>
+    /// <summary> ロード画面を表示・非表示させる </summary>
     public void LoadPanel(bool active) { transform.GetChild(0).gameObject.SetActive(active); }
 
-    /// <summary> Scene切り替え と Battle番号登録 </summary>
+    /// <summary> Scene切り替え・Battle番号登録 </summary>
     /// <param name="name"></param>
     public void LoadScene(string name = "Title", int no = -1) {
         BattleNo = no;
@@ -95,11 +96,12 @@ public class GameManager : MonoBehaviour
             P_Status.Nama = name;
         }
         else {          //LoadGame
-            if(text == "") {
+            if(text == "") {    //ありえないが念のため
                 Quit();
                 return;
             }
 
+            //箱を作成し、下記で代入
             P_Status = new StatusBox();
 
             P_Status.Nama = text.Substring(5);
@@ -125,6 +127,7 @@ public class GameManager : MonoBehaviour
             text = CheckDataFile(no, 7).Substring(5);
             P_Status.Pit = int.Parse(text);
 
+            //ステージのクリア状況を取得
             string clear = CheckDataFile(no, 8).Substring(0);
             for (int i = 0; i < clear.Length; i++) {
                 ClearStage.Add(int.Parse(clear.Substring(i)) == 1);
@@ -179,7 +182,8 @@ public class GameManager : MonoBehaviour
     /// <summary> StageのClear状況を取得 </summary>
     /// <param name="no"></param>
     /// <returns></returns>
-    public bool GetClearStage(int no) {
+    public bool GetClearStage(int no = -1) {
+        if (no < 0) no = BattleNo;
         if (no < 0) {
             Debug.LogError("StageNoが負");
             return false;
@@ -193,5 +197,11 @@ public class GameManager : MonoBehaviour
         if (BattleNo < 0) return;
         if (BattleNo >= ClearStage.Count) Debug.LogError("ClearStageの連携Miss");
         ClearStage[BattleNo] = true;
+    }
+
+    /// <summary> StageClear_LevelUp!! </summary>
+    public void LevelUp() {
+        P_Status.Lvl += 1;
+        P_Status.Pit += 5;
     }
 }

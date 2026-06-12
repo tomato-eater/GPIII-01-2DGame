@@ -86,7 +86,7 @@ public class Player : LiveTemp
         }
     }
 
-    /// <summary> 攻撃 </summary>
+    /// <summary> 攻撃終了 </summary>
     public override void Attack() {
         if (ModeType == ModeTypeList.Finish) return;
         ModeType = ModeTypeList.Default;
@@ -115,7 +115,7 @@ public class Player : LiveTemp
         {
             coll.enabled = false;
         }
-        Debug.Log("消える処理とか追加したい");
+        FindAnyObjectByType<BattleController>().FinishBattle();
     }
 
     /// <summary> 足元が何かに当たったら </summary>

@@ -4,11 +4,8 @@ using UnityEngine;
 using R3;
 using Cysharp.Threading.Tasks;
 
-/// <summary>
-/// 行動規定
-/// </summary>
-public enum ModeTypeList
-{
+/// <summary> 行動規定 </summary>
+public enum ModeTypeList {
     First,
     Default,
     Attack,
@@ -17,9 +14,7 @@ public enum ModeTypeList
     Finish
 }
 
-/// <summary>
-/// 自分や敵のクラスのテンプレートクラス
-/// </summary>
+/// <summary> 自分や敵のクラスのテンプレートクラス </summary>
 public class LiveTemp : MonoBehaviour
 {
     ///<summary> ID </summary>
@@ -51,14 +46,10 @@ public class LiveTemp : MonoBehaviour
     /// <summary> アニメータ－コンポーネント </summary>
     public Animator Anima;
 
-    /// <summary>
-    /// 行動規定
-    /// </summary>
+    /// <summary> 行動規定登録 </summary>
     public ModeTypeList ModeType;
 
-    /// <summary>
-    /// enum
-    /// </summary>
+    /// <summary> 行動規定に基づいた呼び出し関数の登録 </summary>
     protected Dictionary<ModeTypeList, Action> Action;
 
     /*-----*/
@@ -79,14 +70,10 @@ public class LiveTemp : MonoBehaviour
     /// <summary> ゲーム開始前に呼び出される関数 </summary>
     public virtual void First() { Debug.Log("テンプレートFirst"); }
 
-    /// <summary>
-    /// 通常時に呼び出される関数
-    /// </summary>
+    /// <summary> 通常時に呼び出される関数 </summary>
     protected virtual void Default() { Debug.Log("テンプレートMove"); }
 
-    /// <summary>
-    /// 攻撃時に呼び出される関数
-    /// </summary>
+    /// <summary> 攻撃時に呼び出される関数 </summary>
     public virtual void Attack() { Debug.Log("テンプレートAttack"); }
 
     /// <summary>
@@ -104,6 +91,8 @@ public class LiveTemp : MonoBehaviour
         Timer().Forget();
     }
 
+    /// <summary> 無敵解除用 </summary>
+    /// <returns></returns>
     async UniTask Timer()
     {
         await UniTask.Delay(TimeSpan.FromSeconds(0.3f));
@@ -112,13 +101,9 @@ public class LiveTemp : MonoBehaviour
         DisableDamage = false;
     }
 
-    /// <summary>
-    /// 死亡時に呼び出される関数
-    /// </summary>
+    /// <summary> 死亡時に呼び出される関数 </summary>
     protected virtual void Death() { Debug.Log("テンプレートDeath"); }
 
-    /// <summary>
-    /// ゲーム終了時に呼び出される関数
-    /// </summary>
+    /// <summary> ゲーム終了時に呼び出される関数 </summary>
     public virtual void Finish() { Debug.Log("テンプレートFinish"); }
 }
