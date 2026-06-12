@@ -88,6 +88,7 @@ public class Player : LiveTemp
 
     /// <summary> 攻撃 </summary>
     public override void Attack() {
+        if (ModeType == ModeTypeList.Finish) return;
         ModeType = ModeTypeList.Default;
         DisableDamage = false;
     }
@@ -110,7 +111,6 @@ public class Player : LiveTemp
     protected override void Death() {
         ModeType = ModeTypeList.Death;
         Anima.Play("Die");
-        Rb2d.simulated = false;
         if(TryGetComponent<BoxCollider2D>(out var coll))
         {
             coll.enabled = false;

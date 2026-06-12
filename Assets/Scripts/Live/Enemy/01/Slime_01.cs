@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -51,7 +52,7 @@ public class Slime_01 : LiveTemp
         transform.localScale = new Vector3(Dir, 1, 1);
 
         var diff = Vector2.Distance(transform.position, Player.position);
-        if (diff <= 3f)
+        if (diff <= 2.5f)
         {
             Anima.Play("Attack");
         }
@@ -87,6 +88,13 @@ public class Slime_01 : LiveTemp
             coll.enabled = false;
         }
         FindAnyObjectByType<BattleController>().KillEnemy();
+        Delete().Forget();
+    }
+
+    async UniTask Delete()
+    {
+        await UniTask.Delay(TimeSpan.FromSeconds(3f));
+        Destroy(gameObject);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
