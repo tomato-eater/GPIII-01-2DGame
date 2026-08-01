@@ -6,7 +6,7 @@ using TMPro;
 /// <summary> Player‚ÌHPBar‚ğ§Œä‚·‚éƒNƒ‰ƒX </summary>
 public class LifeGauge : MonoBehaviour
 {
-    LiveTemp Player;
+    Player Player;
     [SerializeField] Image gaugeImage;
     [SerializeField] TextMeshProUGUI Name;
     float MaxHp;
@@ -16,7 +16,7 @@ public class LifeGauge : MonoBehaviour
     /// </summary>
     public void SetUp()
     {
-        this.Player = GameObject.Find("Player").GetComponent<LiveTemp>();
+        this.Player = FindAnyObjectByType<Player>();
         Name.text = GameManager.MyGameInstance.GetMyStatus().Nama;
         MaxHp = Player.Hp.Value;
         Player.Hp.Subscribe(Hp => UpGauge(Hp)).AddTo(this);

@@ -9,7 +9,7 @@ using UnityEngine.UI;
 public class BattleController : MonoBehaviour
 {
     /// <summary> ŒP—ûŠ‚©“™A”»’f </summary>
-    [SerializeField] bool Battle = true;
+    [SerializeField] bool Battle;
     /// <summary> “G‚Ì” </summary>
     public int EnemyCount = 0;
     /// <summary> PlayerEEnemy ‚ÌƒNƒ‰ƒX•ÛŠÇ </summary>

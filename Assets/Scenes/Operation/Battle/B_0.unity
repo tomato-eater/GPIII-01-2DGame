@@ -3250,6 +3250,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 366313400729938860, guid: c8b856239cfa1824795902b761c606dc, type: 3}
+      propertyPath: Battle
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4368521646833866002, guid: c8b856239cfa1824795902b761c606dc, type: 3}
       propertyPath: m_Camera
       value: 

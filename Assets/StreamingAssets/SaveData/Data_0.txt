@@ -1,9 +1,0 @@
-Name:aef
-Lvl :1
-Hp  :10
-Atk :5
-Dfe :5
-Spd :5
-Jpw :5
-Pit :5
-0

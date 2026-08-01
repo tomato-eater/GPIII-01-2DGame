@@ -16,7 +16,7 @@ public class MenuBattle : MonoBehaviour
     public void SetUp() {
         int lv = GameManager.MyGameInstance.GetMyStatus().Lvl;
         SelectScene = 0;
-        Box = transform.GetChild(0).GetChild(0);
+        Box = transform.Find("Viewport/Content");
         for (int i = 0; i < Box.childCount; i++) {        //Buttonの数
             if (Box.GetChild(i).Find("LevelText").TryGetComponent<Text>(out var text)) {
                 if (int.Parse(text.text.Substring(1)) <= lv) {      //設定したLevelを見て表示・非表示判断
@@ -30,7 +30,6 @@ public class MenuBattle : MonoBehaviour
                 else {      //非表示
                     Box.GetChild(i).gameObject.SetActive(false);
                 }
-                i++;
             }
             else
             {
