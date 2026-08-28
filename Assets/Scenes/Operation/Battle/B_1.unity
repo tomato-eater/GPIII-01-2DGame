@@ -665,6 +665,10 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 326914039}
+    - target: {fileID: 5561250193255223906, guid: c8b856239cfa1824795902b761c606dc, type: 3}
+      propertyPath: m_text
+      value: Finish !!
+      objectReference: {fileID: 0}
     - target: {fileID: 6749912074204247282, guid: c8b856239cfa1824795902b761c606dc, type: 3}
       propertyPath: m_Name
       value: BattleControl

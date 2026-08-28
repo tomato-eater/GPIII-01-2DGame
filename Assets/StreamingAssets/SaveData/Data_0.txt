@@ -1,0 +1,9 @@
+Name:qwe
+Lvl :2
+Hp  :7
+Atk :8
+Dfe :4
+Spd :3
+Jpw :5
+Pit :0
+11
