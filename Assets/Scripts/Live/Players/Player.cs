@@ -18,6 +18,8 @@ public class Player : LiveTemp
     ///<summary> 空中滞在時間 </summary>
     public float AirTime;
 
+    float floorPoint = -100;
+
     /// <summary> コンポーネント取得等 </summary>
     private void Start() {
         ModeType = ModeTypeList.First;
@@ -39,32 +41,46 @@ public class Player : LiveTemp
         if (ModeType != ModeTypeList.Default) return;
 
         JumpTrigger = false;
-        DisableDamage = true;
         ModeType = ModeTypeList.Attack;
         Anima.Play("Attack");
         Rb2d.gravityScale = 8;
+
+        RaycastHit2D hit = Physics2D.Raycast(transform.position , -transform.up, Mathf.Infinity, LayerMask.GetMask("Floor"));
+        if (hit.collider != null) {
+            floorPoint = hit.point.y;
+        }
     }
 
     /// <summary> PlayerInputのMoveが操作されたのを検知・実行 </summary>
     /// <param name="value"></param>
-    void OnMove(InputValue value) { MoveValue = value.Get<Vector2>().x; }
+    void OnMove(InputValue value) {
+        MoveValue = value.Get<Vector2>().x; 
+    }
 
     /// <summary> PlayerInputのJumpが操作さたのを検知・実行 </summary>
     /// <param name="value"></param>
-    void OnJump(InputValue value) { if (DoubleJump || IsGround) JumpTrigger = true; }
+    void OnJump(InputValue value) {
+        if (DoubleJump || IsGround) JumpTrigger = true;
+    }
 
     // Update is called once per frame
     void Update() {
         //ModeTypeによって呼び出す関数を変えているが、あまり意味が無くなってしまった
         if (Action.ContainsKey(ModeType)) Action[ModeType].Invoke();
         if (!IsGround) { AirTime += Time.deltaTime; }
+        if(Rb2d.transform.position.y < floorPoint) {
+            var t = Rb2d.transform.position;
+            t.y = floorPoint;
+            Rb2d.transform.position = t;
+        }
     }
 
     /// <summary> Playerの移動、ジャンプ等 </summary>
     protected override void Default() {
         Rb2d.linearVelocityX = MoveValue * (IsGround ? MoveSpeed : MoveSpeed * 0.5f);
 
-        if (IsGround) {         //地上にいる
+        //地上にいる
+        if (IsGround) {         
             Rb2d.gravityScale = 3;
 
             if (MoveValue != 0) {
@@ -72,8 +88,8 @@ public class Player : LiveTemp
             }
             Anima.Play(MoveValue == 0 ? "Idle" : "Run");
         }
-
-        if (JumpTrigger) {      //ジャンプする
+        //ジャンプする
+        if (JumpTrigger) {      
             JumpTrigger = false;
             DoubleJump = IsGround;
             Rb2d.linearVelocityY = IsGround ? JumpPower : JumpPower * 0.8f;
@@ -90,7 +106,6 @@ public class Player : LiveTemp
     public override void Attack() {
         if (ModeType == ModeTypeList.Finish) return;
         ModeType = ModeTypeList.Default;
-        DisableDamage = false;
     }
 
     /// <summary> 攻撃されたとき実行 </summary>
@@ -100,8 +115,8 @@ public class Player : LiveTemp
         if (DisableDamage) return;
 
         base.Damage(damage, posX);
-
-        if (Hp.Value <= 0) {    //死亡
+        //死亡
+        if (Hp.Value <= 0) {    
             Hp.Value = 0;
             Death();
         }
@@ -111,8 +126,7 @@ public class Player : LiveTemp
     protected override void Death() {
         ModeType = ModeTypeList.Death;
         Anima.Play("Die");
-        if(TryGetComponent<BoxCollider2D>(out var coll))
-        {
+        if(TryGetComponent<BoxCollider2D>(out var coll)) {
             coll.enabled = false;
         }
         FindAnyObjectByType<BattleController>().FinishBattle();
@@ -131,13 +145,16 @@ public class Player : LiveTemp
                 else if(collision.collider.CompareTag("Floor")) {
                     IsGround = true;
                     AirTime = 0;
+                    floorPoint = -100;
                 }
             }
         }
     }
 
     /// <summary> 敵を踏んでいる時 </summary>
-    void EnemyJump() { Rb2d.AddForce(new Vector2(transform.localScale.x * 10, 5), ForceMode2D.Impulse); }
+    void EnemyJump() { 
+        Rb2d.AddForce(new Vector2(transform.localScale.x * 10, 5), ForceMode2D.Impulse); 
+    }
 
     /// <summary> 地面から離れた </summary>
     /// <param name="collision"></param>

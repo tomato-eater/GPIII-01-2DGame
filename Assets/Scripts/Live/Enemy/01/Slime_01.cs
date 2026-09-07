@@ -51,20 +51,21 @@ public class Slime_01 : LiveTemp
     }
 
     /// <summary> à⁄ìÆÇ≥ÇπÇÈ(AnimatorÇ≈êßå‰) </summary>
-    public void Move() { Rb2d.AddForce(new Vector2(Dir * MoveSpeed, JumpPower), ForceMode2D.Impulse); }
+    public void Move() { 
+        Rb2d.AddForce(new Vector2(Dir * MoveSpeed, JumpPower), ForceMode2D.Impulse); 
+    }
 
     public override void Damage(float damageAmount, float posX) {
         if (DisableDamage) return;
         base.Damage(damageAmount, posX);
-
-        if (Hp.Value <= 0) {    //éÄñSîªï 
+        //éÄñSîªï 
+        if (Hp.Value <= 0) {    
             Hp.Value = 0;
             Death();
         }
     }
 
-    protected override void Death()
-    {
+    protected override void Death() {
         ModeType = ModeTypeList.Death;
         Anima.Play("Die");
         if (TryGetComponent<BoxCollider2D>(out var coll)) {     //Colliderñ≥å¯âª
